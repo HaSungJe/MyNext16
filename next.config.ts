@@ -1,45 +1,42 @@
 import type { NextConfig } from "next";
 
+type remotePatternType = {
+    protocol: string;
+    hostname: string;
+    port?: string;
+    pathname: string;
+};
+
+const remotePatterns: Array<remotePatternType> = [
+    {
+        protocol: "http",
+        hostname: "localhost",
+        port: process.env.NEXT_IMAGE_PORT ?? "3000",
+        pathname: "/**",
+    },
+    {
+        protocol: "https",
+        hostname: "s3.ap-northeast-2.amazonaws.com",
+        pathname: "/**",
+    },
+];
+
+if (process.env.NEXT_IMAGE_HOSTNAME) {
+    remotePatterns.push({
+        protocol: "http",
+        hostname: process.env.NEXT_IMAGE_HOSTNAME,
+        port: process.env.NEXT_IMAGE_PORT ?? "3000",
+        pathname: "/**",
+    });
+}
+
 const nextConfig: NextConfig = {
-    // output: "standalone",
     reactStrictMode: true,
     trailingSlash: true,
-    experimental: {
-        reactCompiler: true
-    },
     images: {
-        remotePatterns: [
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: process.env.NEXT_IMAGE_PORT,
-                pathname: "/**",
-            },
-            {
-                protocol: 'http',
-                hostname: process.env.NEXT_IMAGE_HOSTNAME,
-                port: process.env.NEXT_IMAGE_PORT,
-                pathname: "/**",
-            },
-            {
-                protocol: "https",
-                hostname: "s3.ap-northeast-2.amazonaws.com",
-                port: "",
-                pathname: "/**",
-            }
-        ],
+        remotePatterns: remotePatterns as any,
     },
-    basePath: process.env.NEXT_PUBLIC_LOCAL_SERVER_PREFIX,
-    // async rewrites() {
-    //     const internalRewrite = [
-    //         {
-    //             source: `/:path((?! tap|login|test ).*)`,
-    //             destination: '/login-after/:path*',
-    //         }
-    //     ];
-
-    //     return [...internalRewrite];
-    // }
+    basePath: process.env.NEXT_PUBLIC_LOCAL_SERVER_PREFIX
 };
 
 export default nextConfig;
