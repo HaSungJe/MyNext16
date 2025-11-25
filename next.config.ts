@@ -33,6 +33,7 @@ if (process.env.NEXT_IMAGE_HOSTNAME) {
 const nextConfig: NextConfig = {
     reactStrictMode: true,
     trailingSlash: true,
+    reactCompiler: true,
     images: {
         remotePatterns: remotePatterns as any,
     },
