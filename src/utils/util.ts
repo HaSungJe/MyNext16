@@ -59,7 +59,7 @@ export async function axiosErrorHandle(router: AppRouterInstance, error: any, is
 
             let count = 0;
             for (let i=0; i<error.response.data.validationError.length; i++) {
-                const doc: any = document.querySelector(`span[data-type=alert_span][data-id=${error.response.data.validationError[i].property}]`);
+                const doc: any = document.querySelector(`span[data-type=validation-alert][data-id=${error.response.data.validationError[i].property}]`);
                 if (doc) {
                     count++;
                     doc.innerText = error.response.data.validationError[i].message;
@@ -93,7 +93,7 @@ export async function axiosErrorHandle(router: AppRouterInstance, error: any, is
  * Validation Error 초기화
  */
 export function resetValidationError(): void {
-    const docs: any = document.querySelectorAll(`span[data-type=alert_span]`);
+    const docs: any = document.querySelectorAll(`span[data-type=validation-alert]`);
     for (let i=0; i<docs.length; i++) {
         docs[i].innerText = '';
         docs[i].style.color = '';
@@ -143,7 +143,7 @@ export async function validateAction(dto: any): Promise<boolean> {
 
         let span_alert_count = 0;
         for (let i=0; i<errors.length; i++) {
-            const doc: any = document.querySelector(`span[data-type=alert_span][data-id=${errors[i].property}]`);
+            const doc: any = document.querySelector(`span[data-type=validation-alert][data-id=${errors[i].property}]`);
             if (doc) {
                 doc.innerText = errors[i].message;
                 doc.style.color = 'red';
@@ -203,7 +203,7 @@ export async function validateActionChilds(dto: any, key: string): Promise<boole
 
         let span_alert_count = 0;
         for (let i=0; i<errors.length; i++) {
-            const doc: any = document.querySelector(`span[data-type=alert_span][data-id=${errors[i].property}][data-key='${key}']`);
+            const doc: any = document.querySelector(`span[data-type=validation-alert][data-id=${errors[i].property}][data-key='${key}']`);
             if (doc) {
                 doc.innerText = errors[i].message;
                 doc.style.color = 'red';

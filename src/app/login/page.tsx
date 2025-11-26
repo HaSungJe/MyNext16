@@ -62,14 +62,14 @@ const Login: React.FC<null> = memo(() => {
                             <th>아이디</th>
                             <td>
                                 <input type="text" value={loginId.value} onChange={loginId.onChange} />
-                                <span data-type="alert_span" data-id="login_id"></span>
+                                <span data-type="validation-alert" data-id="login_id"></span>
                             </td>
                         </tr>
                         <tr>
                             <th>비밀번호</th>
                             <td>
                                 <input type="password" value={loginPw.value} onChange={loginPw.onChange}/>
-                                <span data-type="alert_span" data-id="login_pw"></span>
+                                <span data-type="validation-alert" data-id="login_pw"></span>
                             </td>
                         </tr>
                     </tbody>
