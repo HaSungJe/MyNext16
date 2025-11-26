@@ -1,62 +1,27 @@
 'use client';
-import { AccessDataType } from '@/types/user';
-import { getAccessToken } from './cookie';
+import { deleteToken, getAccessToken } from '@/utils/cookie';
+import { useRouter } from 'next/navigation';
+import { axiosErrorHandle } from './util';
 import axios from 'axios';
 
-/**
- * 엑셀 다운로드
- * 
- * @param loginData
- * @param fileName 
- * @param url 
- * @param reload 
- */
-export async function axiosExcelDown(loginData: AccessDataType, url: string, fileName: string, headers: Record<string, any> = {}) {
-    try {
-        const response = await axios.get(url, {responseType: 'blob', headers: {...headers,Authorization: `Bearer ${loginData?.accessToken}`}});
-        const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.setAttribute('download', `${fileName}.xlsx`);
-        link.style.cssText = "display:none";
-        link.click();
-        link.remove();
-    } catch (error: any) {
-        if (error?.response?.data?.statusCode === 401) {
-            if (headers['retry'] === undefined) {
-                headers['retry'] = '1';
-                loginData.accessTokenRefresh();
-                return await axiosExcelDown(loginData, url, fileName, headers);
-            } else {
-                throw error;
-            }
-        } else {
-            throw error;
-        }
-    }
-}
+type AppRouterInstance = ReturnType<typeof useRouter>;
 
 /**
  * Get
  * 
- * @param loginData
+ * @param router
  * @param url 
  * @param headers
  */
-export async function axiosGet(loginData: AccessDataType, url: string, headers: Record<string, any> = {}) {
+export async function axiosGet(router: AppRouterInstance, url: string, headers: object = {}) {
     try {
-        return await axios.get(url, {headers: {...headers, Authorization: `Bearer ${loginData?.accessToken}`}});
+        const accessToken = await getAccessToken();
+        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
+        return await axios.get(url, {headers: {...headers, authorization, accessToken: accessToken}});
     } catch (error: any) {
-        if (error?.response?.data?.statusCode === 401) {
-            if (headers['retry'] === undefined) {
-                headers['retry'] = '1';
-                if (loginData && loginData?.accessTokenRefresh) {
-                    loginData.accessTokenRefresh();
-                }
-                return await axiosGet(loginData, url, headers);
-            } else {
-                throw error;
-            }
+        if (error.response.data.statusCode === 401) {
+            await deleteToken();
+            await axiosErrorHandle(error, router);
         } else {
             throw error;
         }
@@ -66,27 +31,21 @@ export async function axiosGet(loginData: AccessDataType, url: string, headers: 
 /**
  * Post 
  * 
- * @param loginData
+ * @param router
  * @param url 
  * @param body 
  * @param headers
  * @returns 
  */
-export async function axiosPost(loginData: AccessDataType, url: string, body: any, headers: Record<string, any> = {}) {
+export async function axiosPost(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
     try {
         const accessToken = await getAccessToken();
-        return await axios.post(url, body, {headers: {...headers, Authorization: `Bearer ${accessToken}`,},});
+        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
+        return await axios.post(url, body, {headers: {...headers, authorization, accessToken: accessToken}});
     } catch (error: any) {
-        if (error?.response?.data?.statusCode === 401) {
-            if (headers['retry'] === undefined) {
-                headers['retry'] = '1';
-                if (loginData && loginData?.accessTokenRefresh) {
-                    loginData.accessTokenRefresh();
-                }
-                return await axiosPost(loginData, url, body, headers);
-            } else {
-                throw error
-            }
+        if (error.response.data.statusCode === 401) {
+            await deleteToken();
+            await axiosErrorHandle(error, router);
         } else {
             throw error;
         }
@@ -96,27 +55,21 @@ export async function axiosPost(loginData: AccessDataType, url: string, body: an
 /**
  * Put
  * 
- * @param loginData
+ * @param router
  * @param url 
  * @param body 
  * @param headers
  * @returns 
  */
-export async function axiosPut(loginData: AccessDataType, url: string, body: any, headers: Record<string, any> = {}) {
+export async function axiosPut(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
     try {
         const accessToken = await getAccessToken();
-        return await axios.put(url, body, {headers: {...headers, Authorization: `Bearer ${accessToken}`}});
+        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
+        return await axios.put(url, body, {headers: {...headers, authorization, accessToken: accessToken}});
     } catch (error: any) {
-        if (error?.response?.data?.statusCode === 401) {
-            if (headers['retry'] === undefined) {
-                headers['retry'] = '1';
-                if (loginData && loginData?.accessTokenRefresh) {
-                    loginData.accessTokenRefresh();
-                }
-                return await axiosPut(loginData, url, body, headers);
-            } else {
-                throw error
-            }
+        if (error.response.data.statusCode === 401) {
+            await deleteToken();
+            await axiosErrorHandle(error, router);
         } else {
             throw error;
         }
@@ -126,28 +79,22 @@ export async function axiosPut(loginData: AccessDataType, url: string, body: any
 /**
  * Patch
  * 
- * @param loginData
+ * @param router
  * @param url 
  * @param body 
  * @param reload 
  * @param headers
  * @returns 
  */
-export async function axiosPatch(loginData: AccessDataType, url: string, body: any, headers: Record<string, any> = {}) {
+export async function axiosPatch(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
     try {
         const accessToken = await getAccessToken();
-        return await axios.patch(url, body, {headers: {...headers, Authorization: `Bearer ${accessToken}`}});
+        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
+        return await axios.patch(url, body, {headers: {...headers, authorization, accessToken: accessToken}});
     } catch (error: any) {
-        if (error?.response?.data?.statusCode === 401) {
-            if (headers['retry'] === undefined) {
-                headers['retry'] = '1';
-                if (loginData && loginData?.accessTokenRefresh) {
-                    loginData.accessTokenRefresh();
-                }
-                return await axiosPatch(loginData, url, body, headers);
-            } else {
-                throw error
-            }
+        if (error.response.data.statusCode === 401) {
+            await deleteToken();
+            await axiosErrorHandle(error, router);
         } else {
             throw error;
         }
@@ -157,30 +104,24 @@ export async function axiosPatch(loginData: AccessDataType, url: string, body: a
 /**
  * Delete
  * 
- * @param loginData
+ * @param router
  * @param url 
  * @param body 
  * @param headers
  */
-export async function axiosDelete(loginData: AccessDataType, url: string, body: any, headers: Record<string, any> = {}) {
+export async function axiosDelete(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
     try {
         const accessToken = await getAccessToken();
+        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         if (body && body !== null) {
-            await axios.delete(url, {data: body, headers: {...headers, Authorization: `Bearer ${accessToken}`}});
+            await axios.delete(url, { data: body, headers: {...headers, authorization, accessToken: accessToken}});
         } else {
-            await axios.delete(url, {headers: {...headers, Authorization: `Bearer ${accessToken}`}});
+            await axios.delete(url, { headers: {...headers, authorization, accessToken: accessToken}});
         }
     } catch (error: any) {
-        if (error?.response?.data?.statusCode === 401) {
-            if (headers['retry'] === undefined) {
-                headers['retry'] = '1';
-                if (loginData && loginData?.accessTokenRefresh) {
-                    loginData.accessTokenRefresh();
-                }
-                return await axiosDelete(loginData, url, body, headers);
-            } else {
-                throw error
-            }
+        if (error.response.data.statusCode === 401) {
+            await deleteToken();
+            await axiosErrorHandle(error, router);
         } else {
             throw error;
         }
