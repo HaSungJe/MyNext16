@@ -105,9 +105,12 @@ export function resetValidationError(): void {
  * Validation 체크 및 오류처리
  * 
  * @param dto 
+ * @param reset
  */
-export async function validateAction(dto: any): Promise<boolean> {
-    resetValidationError();
+export async function validateAction(dto: any, reset: boolean = true): Promise<boolean> {
+    if (reset) {
+        resetValidationError();
+    }
 
     try {
         await validateOrReject(dto);
