@@ -15,10 +15,22 @@ export default function useInputDate(dot: string, initValue: string = ""): UseIn
     const onCreate = useCallback((changeValue: string) => {
         changeValue = changeValue.toString().replace(/[^0-9]/g, '');
         changeValue = changeValue && changeValue.length > 0 ? changeValue = changeValue.substring(0, 8) : changeValue;
-        const year = value.substr(0, 4);
-        const month = value.substr(4, 2);
-        const day = value.substr(6, 2);
-        return year + (month ? `${dot}${month}` : '') + (day ? `${dot}${day}` : '');
+        const year = changeValue.substring(0, 4);
+        const month = changeValue.substring(4, 6);
+        const day = changeValue.substring(6, 8);
+
+        const result: Array<string> = [];
+        if (year) {
+            result.push(year);
+        }
+        if (month) {
+            result.push(month);
+        }
+        if (day) {
+            result.push(day);
+        }
+
+        return result.join(dot);
     }, []);
 
     // 값 변경
