@@ -2,7 +2,7 @@ import { ChangeEvent, ChangeEventHandler, useCallback, useState } from "react";
 
 export type UseInputType = {
     value: string;
-    onChange: ChangeEventHandler<HTMLInputElement>;
+    onChange: ChangeEventHandler<HTMLInputElement | HTMLSelectElement>;
     setValue: Function;
     resetValue: Function;
 }
@@ -12,7 +12,7 @@ export default function useInput(initValue: string = ""): UseInputType {
     const [value, setValue] = useState<string>(initValue);
 
     // 값 변경
-    const onChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const onChange = useCallback((event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setValue(event.target.value);
     }, []);
 
