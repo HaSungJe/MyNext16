@@ -8,7 +8,7 @@ export type UseInputDateType = {
 }
 
 // 검색정보 변경
-export default function useInput(dot: string, initValue: string = ""): UseInputDateType {
+export default function useInputDate(dot: string, initValue: string = ""): UseInputDateType {
     const [value, setValue] = useState<string>(initValue);
 
     // 값 생성
