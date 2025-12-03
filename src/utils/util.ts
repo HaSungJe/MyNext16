@@ -64,7 +64,7 @@ export async function axiosErrorHandle(router: AppRouterInstance, error: any, is
                     count++;
                     doc.innerText = error.response.data.validationError[i].message;
                     doc.style.color = 'red';
-                    doc.style.display = '';
+                    doc.style.display = 'block';
                 }
             }
             
@@ -150,7 +150,7 @@ export async function validateAction(dto: any, reset: boolean = true): Promise<b
             if (doc) {
                 doc.innerText = errors[i].message;
                 doc.style.color = 'red';
-                doc.style.display = '';
+                doc.style.display = 'block';
                 span_alert_count++;
             }
         }
@@ -210,7 +210,7 @@ export async function validateActionChilds(dto: any, key: string): Promise<boole
             if (doc) {
                 doc.innerText = errors[i].message;
                 doc.style.color = 'red';
-                doc.style.display = '';
+                doc.style.display = 'block';
                 span_alert_count++;
             }
         }
