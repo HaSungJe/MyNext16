@@ -15,10 +15,10 @@
     "class-validator": "^0.14.2",
     "dayjs": "^1.11.18",
     "jsonwebtoken": "^9.0.2",
-    "next": "16.0.0",
-    "react": "19.1.0",
+    "next": "^16.0.7",
+    "react": "^19.1.2",
     "react-apexcharts": "^1.7.0",
-    "react-dom": "19.1.0",
+    "react-dom": "^19.1.2",
     "react-quill-new": "^3.6.0",
     "react-spinners": "^0.17.0"
   },
