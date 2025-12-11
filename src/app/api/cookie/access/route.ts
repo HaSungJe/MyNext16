@@ -59,9 +59,11 @@ export async function GET(request: Request): Promise<Response> {
             if (response.data.refresh_token) {
                 cookieStore.set('refreshToken', response.data.refresh_token, {
                     path: "/",
+                    domain: process.env.SERVER_DOMAIN ?? undefined,
                     httpOnly: true,
-                    sameSite: "strict",
+                    sameSite: process.env.SERVER_DOMAIN ? "lax" : "strict",
                     secure: process.env.NODE_ENV === 'development' ? false : isSecure, 
+                    expires: response.data.refresh_token_end_dt ? new Date(response.data.refresh_token_end_dt) : new Date(new Date().getTime() + (60 * 60 * 24 * 30 * 1000))
                 });
             }
 
@@ -69,9 +71,10 @@ export async function GET(request: Request): Promise<Response> {
             const setTime = new Date(new Date(response.data.access_token_end_dt).getTime() - (60 * 1000)); 
             cookieStore.set('accessToken', response.data.access_token, {
                 path: "/",
+                domain: process.env.SERVER_DOMAIN ?? undefined,
                 httpOnly: true,
-                sameSite: "strict",
-                secure: process.env.NODE_ENV === 'development' ? false : isSecure,
+                sameSite: process.env.SERVER_DOMAIN ? "lax" : "strict",
+                secure: process.env.NODE_ENV === 'development' ? false : isSecure, 
                 expires: setTime
             });
 
@@ -110,8 +113,9 @@ export async function POST(request: Request): Promise<Response> {
         
         cookieStore.set('accessToken', data, {
             path: "/",
+            domain: process.env.SERVER_DOMAIN ?? undefined,
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: process.env.SERVER_DOMAIN ? "lax" : "strict",
             secure: process.env.NODE_ENV === 'development' ? false : isSecure, 
             expires: endTime
         });

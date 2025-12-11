@@ -25,14 +25,16 @@ export async function POST(request: Request): Promise<Response> {
     const isSecure = proto === 'https';
 
     const cookieStore = await cookies();
-    const { data } = await request.json();
+    const { setTime, data } = await request.json();
 
     try {
         cookieStore.set('refreshToken', data, {
             path: "/",
+            domain: process.env.SERVER_DOMAIN ?? undefined,
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: process.env.SERVER_DOMAIN ? "lax" : "strict",
             secure: process.env.NODE_ENV === 'development' ? false : isSecure, 
+            expires: setTime ? new Date(setTime) : new Date(new Date().getTime() + (60 * 60 * 24 * 30 * 1000))
         });
     
         return new Response(JSON.stringify({ success: true }), { headers });
