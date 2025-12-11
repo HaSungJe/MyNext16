@@ -37,7 +37,19 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: remotePatterns as any,
     },
-    basePath: process.env.NEXT_PUBLIC_LOCAL_SERVER_PREFIX
+    basePath: process.env.NEXT_PUBLIC_LOCAL_SERVER_PREFIX,
+    async rewrites() {
+        if (process.env.NEXT_PUBLIC_LOCAL_SERVER_PREFIX) {
+            return [
+                {
+                    source: `${process.env.NEXT_PUBLIC_LOCAL_SERVER_PREFIX}/:path*`,
+                    destination: `/:path*`
+                },
+            ]
+        }
+        
+        return [];
+    }
 };
 
 export default nextConfig;
