@@ -50,47 +50,11 @@ export async function GET(request: Request): Promise<Response> {
     if (refreshToken) {
         try {
             const refresh_token: string = refreshToken.value;
-            
-            // 시도할 URL 목록 (순서대로)
-            const apiUrls = [
-                process.env.SERVER_API_URL,      // 1순위: localhost (있으면)
-                process.env.NEXT_PUBLIC_API_URL  // 2순위: 로드밸런서
-            ].filter(Boolean); // undefined 제거
-
-            let response;
-            let lastError;
-
-            // 순차적으로 시도
-            for (const apiUrl of apiUrls) {
-                try {
-                    console.log(`[${dayjs().format('HH:mm:ss')}] Trying API: ${apiUrl}`);
-                    
-                    response = await axios.post(
-                        `${apiUrl}/api/v1/common/user/refresh`,
-                        { refresh_token },
-                        { 
-                            httpsAgent: apiUrl.startsWith('https') ? httpsAgent : undefined,
-                            timeout: 3000, // 로컬은 빠르게 실패
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        }
-                    );
-                    
-                    console.log(`[${dayjs().format('HH:mm:ss')}] ✓ Success with: ${apiUrl}`);
-                    break; // 성공하면 루프 종료
-                    
-                } catch (error: any) {
-                    console.log(`[${dayjs().format('HH:mm:ss')}] ✗ Failed: ${apiUrl} - ${error.message}`);
-                    lastError = error;
-                    // 다음 URL로 계속 시도
-                }
-            }
-
-            // 모든 시도 실패
-            if (!response) {
-                throw lastError || new Error('All API endpoints failed');
-            }
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/refresh`,
+                { refresh_token },
+                { httpsAgent }
+            );
             
             if (response.data.refresh_token) {
                 cookieStore.set('refreshToken', response.data.refresh_token, {
@@ -101,6 +65,7 @@ export async function GET(request: Request): Promise<Response> {
                 });
             }
 
+            // 유지시간보다 1분 빨리 끝나도록해서 가능한 재발급받도록
             const setTime = new Date(new Date(response.data.access_token_end_dt).getTime() - (60 * 1000)); 
             cookieStore.set('accessToken', response.data.access_token, {
                 path: "/",
@@ -118,12 +83,9 @@ export async function GET(request: Request): Promise<Response> {
             }
         } catch (error: any) {
             console.log(`-------------Refresh Error ${dayjs().format('YYYY-MM-DD HH:mm:ss')} --------------`)
-            console.log('All endpoints failed')
-            console.log('Last error:', error.message)
-            console.log('Status:', error.response?.status)
             return new Response(JSON.stringify({ success: false }), { headers });
         }
-    } else {
+    } else { // RefreshToken 미존재시, 로그인 정보 없음.
         return new Response(JSON.stringify({ success: false }), { headers });
     }
 }
