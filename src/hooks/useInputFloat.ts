@@ -1,6 +1,6 @@
 import { ChangeEvent, ChangeEventHandler, useCallback, useState } from "react";
 
-export type UseInputNumberType = {
+export type UseInputFloatType = {
     value: string | number;
     onChange: ChangeEventHandler<HTMLInputElement>;
     setValue: Function;
@@ -8,7 +8,7 @@ export type UseInputNumberType = {
 }
 
 // 검색정보 변경
-export default function useInputNumberFloat(isNumberString: boolean, initValue: string | number = 0): UseInputNumberType {
+export default function useInputNumberFloat(isNumberString: boolean, initValue: string | number = 0): UseInputFloatType {
     const [value, setValue] = useState<string | number>(initValue);
 
     // 값 생성
