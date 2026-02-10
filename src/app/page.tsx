@@ -1,15 +1,14 @@
 'use client';
-import { AccessDataType } from "@/types/user";
 import { useContext, useEffect } from "react";
-import { LoginContext } from "./LayoutProvider";
+import { IsLogin } from "./LayoutProvider";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
     const router = useRouter();
-    const loginData: AccessDataType = useContext(LoginContext);
+    const isLogin: boolean = useContext(IsLogin);
     
     useEffect(() => {
-        if (loginData?.accessToken) {
+        if (isLogin) {
             router.push('/dashboard');
         } else {
             router.push('/login');

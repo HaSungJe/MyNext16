@@ -1,27 +1,42 @@
 'use client';
 import { deleteToken, getAccessToken } from '@/utils/cookie';
-import { useRouter } from 'next/navigation';
-import { axiosErrorHandle } from './util';
 import axios from 'axios';
 
-type AppRouterInstance = ReturnType<typeof useRouter>;
+type AccessType = {
+    accessToken: string;
+    setAccessToken: (accessToken: string) => void;
+    reload?: boolean;
+}
 
 /**
  * Get
  * 
- * @param router
+ * @param access
  * @param url 
  * @param headers
  */
-export async function axiosGet(router: AppRouterInstance, url: string, headers: object = {}) {
+export async function axiosGet(access: AccessType, url: string, headers: object = {}) {
     try {
-        const accessToken = await getAccessToken();
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.get(url, {headers: {...headers, authorization, accessToken: accessToken}});
+        return await axios.get(url, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            await deleteToken();
-            await axiosErrorHandle(error, router);
+            if (access?.reload === false) {
+                const accessToken = await getAccessToken();
+                if (accessToken) {
+                    access.setAccessToken(accessToken);
+                    access.reload = true;
+                    return await axiosGet(access, url, headers);
+                } else {
+                    access.setAccessToken(null);
+                    await deleteToken();
+                    throw error;
+                }
+            } else {
+                access.setAccessToken(null);
+                await deleteToken();
+                throw error;
+            }
         } else {
             throw error;
         }
@@ -31,21 +46,34 @@ export async function axiosGet(router: AppRouterInstance, url: string, headers: 
 /**
  * Post 
  * 
- * @param router
+ * @param access
  * @param url 
  * @param body 
  * @param headers
  * @returns 
  */
-export async function axiosPost(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
+export async function axiosPost(access: AccessType, url: string, body: any, headers: object = {}) {
     try {
-        const accessToken = await getAccessToken();
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.post(url, body, {headers: {...headers, authorization, accessToken: accessToken}});
+        return await axios.post(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            await deleteToken();
-            await axiosErrorHandle(error, router);
+            if (access?.reload === false) {
+                const accessToken = await getAccessToken();
+                if (accessToken) {
+                    access.setAccessToken(accessToken);
+                    access.reload = true;
+                    return await axiosPost(access, url, body, headers);
+                } else {
+                    access.setAccessToken(null);
+                    await deleteToken();
+                    throw error;
+                }
+            } else {
+                access.setAccessToken(null);
+                await deleteToken();
+                throw error;
+            }
         } else {
             throw error;
         }
@@ -55,21 +83,34 @@ export async function axiosPost(router: AppRouterInstance, url: string, body: an
 /**
  * Put
  * 
- * @param router
+ * @param access
  * @param url 
  * @param body 
  * @param headers
  * @returns 
  */
-export async function axiosPut(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
+export async function axiosPut(access: AccessType, url: string, body: any, headers: object = {}) {
     try {
-        const accessToken = await getAccessToken();
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.put(url, body, {headers: {...headers, authorization, accessToken: accessToken}});
+        return await axios.put(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            await deleteToken();
-            await axiosErrorHandle(error, router);
+            if (access?.reload === false) {
+                const accessToken = await getAccessToken();
+                if (accessToken) {
+                    access.setAccessToken(accessToken);
+                    access.reload = true;
+                    return await axiosPut(access, url, body, headers);
+                } else {
+                    access.setAccessToken(null);
+                    await deleteToken();
+                    throw error;
+                }
+            } else {
+                access.setAccessToken(null);
+                await deleteToken();
+                throw error;
+            }
         } else {
             throw error;
         }
@@ -79,22 +120,34 @@ export async function axiosPut(router: AppRouterInstance, url: string, body: any
 /**
  * Patch
  * 
- * @param router
+ * @param access
  * @param url 
  * @param body 
- * @param reload 
  * @param headers
  * @returns 
  */
-export async function axiosPatch(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
+export async function axiosPatch(access: AccessType, url: string, body: any, headers: object = {}) {
     try {
-        const accessToken = await getAccessToken();
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.patch(url, body, {headers: {...headers, authorization, accessToken: accessToken}});
+        return await axios.patch(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            await deleteToken();
-            await axiosErrorHandle(error, router);
+            if (access?.reload === false) {
+                const accessToken = await getAccessToken();
+                if (accessToken) {
+                    access.setAccessToken(accessToken);
+                    access.reload = true;
+                    return await axiosPatch(access, url, body, headers);
+                } else {
+                    access.setAccessToken(null);
+                    await deleteToken();
+                    throw error;
+                }
+            } else {
+                access.setAccessToken(null);
+                await deleteToken();
+                throw error;
+            }
         } else {
             throw error;
         }
@@ -104,24 +157,37 @@ export async function axiosPatch(router: AppRouterInstance, url: string, body: a
 /**
  * Delete
  * 
- * @param router
+ * @param access
  * @param url 
  * @param body 
  * @param headers
  */
-export async function axiosDelete(router: AppRouterInstance, url: string, body: any, headers: object = {}) {
+export async function axiosDelete(access: AccessType, url: string, body: any, headers: object = {}) {
     try {
-        const accessToken = await getAccessToken();
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         if (body && body !== null) {
-            await axios.delete(url, { data: body, headers: {...headers, authorization, accessToken: accessToken}});
+            return await axios.delete(url, { data: body, headers: {...headers, authorization, accessToken: access.accessToken}});
         } else {
-            await axios.delete(url, { headers: {...headers, authorization, accessToken: accessToken}});
+            return await axios.delete(url, { headers: {...headers, authorization, accessToken: access.accessToken}});
         }
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            await deleteToken();
-            await axiosErrorHandle(error, router);
+            if (access?.reload === false) {
+                const accessToken = await getAccessToken();
+                if (accessToken) {
+                    access.setAccessToken(accessToken);
+                    access.reload = true;
+                    return await axiosDelete(access, url, body, headers);
+                } else {
+                    access.setAccessToken(null);
+                    await deleteToken();
+                    throw error;
+                }
+            } else {
+                access.setAccessToken(null);
+                await deleteToken();
+                throw error;
+            }
         } else {
             throw error;
         }

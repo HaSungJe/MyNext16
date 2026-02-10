@@ -1,3 +1,5 @@
+# .windsurfrules
+
 # 전역 에이전트
 ## 0) 목적
 이 문서는 이 레포의 **구조/코드 스타일/라우팅/인증(쿠키)/API 호출 규칙**에 맞춰, AI가 새 기능을 만들 때 “기존 코드처럼” 생성하도록 하기 위한 가이드입니다.
@@ -179,7 +181,7 @@
 
 - **[필수]** 영향 범위 최소화(멋대로 삽입 금지)
   - “컴포넌트를 만들어줘” 요청을 받으면 **기본은 컴포넌트 파일만 생성/수정**합니다.
-  - 기존 페이지/기존 컴포넌트에 임의로 import/렌더링을 추가하지 않습니다.
+  - 요청받은 컴포넌트를 수정하되, 타 컴포넌트에 임의로 import/렌더링을 하지 않고 추가여부를 묻고 진행합니다.
   - 연결(어느 페이지에 넣을지)이 필요하면, 먼저 사용자에게 **삽입 위치/트리거/노출 조건**을 확인한 뒤 진행합니다.
 
 ## 5.1) Next.js 16 기준 간결화 규칙
@@ -195,16 +197,27 @@
 ### 6.1 API 호출은 `src/utils/axios.ts`를 사용
 직접 `axios.get/post/...`를 호출하지 말고 아래 함수를 사용합니다.
 
-- `axiosGet(router, url, headers?)`
-- `axiosPost(router, url, body, headers?)`
-- `axiosPut(router, url, body, headers?)`
-- `axiosPatch(router, url, body, headers?)`
-- `axiosDelete(router, url, body, headers?)`
+- `axiosGet(access, url, headers?)`
+- `axiosPost(access, url, body, headers?)`
+- `axiosPut(access, url, body, headers?)`
+- `axiosPatch(access, url, body, headers?)`
+- `axiosDelete(access, url, body, headers?)`
 
 이 레이어에서 아래를 보장합니다.
-- `authorization` 헤더 자동 포함 (`process.env.NEXT_PUBLIC_AUTHORIZATION`)
-- `accessToken` 헤더 자동 포함 (`getAccessToken()` 결과)
-- 401이면 토큰 삭제(`deleteToken()`)
+- `accessToken` 헤더 포함 (`access.accessToken`)
+- **401 처리**
+  - `access.reload === false`이면 `getAccessToken()`으로 accessToken 재조회/재발급 시도
+  - accessToken을 받으면 `access.setAccessToken(accessToken)` 호출 후 `access.reload = true`로 바꾸고 **1회 재시도**
+  - 재시도 이후에도 401이거나 accessToken을 못 받으면 `access.setAccessToken(null)` 후 토큰 삭제(`deleteToken()`)
+
+호출자는 아래를 지켜야 합니다.
+- `authorization` 헤더는 **자동 포함되지 않음**
+  - 백엔드가 `authorization`을 요구하면, 호출부에서 `headers`로 직접 전달합니다.
+    - 예: `{ authorization: process.env.NEXT_PUBLIC_AUTHORIZATION }`
+- `access` 객체는 최소한 아래 형태로 전달합니다.
+  - `accessToken`: string
+  - `setAccessToken(accessToken: string): void`
+  - `reload`: boolean (초기값은 `false`로 두고, 재시도는 1회만 허용)
 
 ### 6.2 인증/토큰은 “브라우저 직접 접근 금지” 패턴
 토큰은 httpOnly 쿠키에 저장되며, 클라이언트는 쿠키 값을 직접 읽지 않습니다.

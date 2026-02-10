@@ -1,5 +1,5 @@
 'use server';
-import { accessTokenDecodeType } from "@/types/user";
+import { accessTokenDecodeType } from "@/types/access";
 import { cookies, headers as nextHeaders } from "next/headers";
 import axios from "axios";
 import https from 'https';
@@ -49,20 +49,25 @@ export async function GET(request: Request): Promise<Response> {
     const refreshToken = cookieStore.get("refreshToken");
     if (refreshToken) {
         try {
-            const refresh_token: string = refreshToken.value;
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/refresh`,
-                { refresh_token },
-                { httpsAgent }
-            );
-            
+            const refresh_token: string = refreshToken.value;            
+            const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/common/user/refresh`;
+            const body = {refresh_token};
+            const response = await axios.post(url, body, {
+                headers: {
+                    authorization,
+                    Authorization: authorization,
+                    'Content-Type': 'application/json'
+                }
+            });
+
             if (response.data.refresh_token) {
                 cookieStore.set('refreshToken', response.data.refresh_token, {
                     path: "/",
                     domain: process.env.SERVER_DOMAIN ?? undefined,
                     httpOnly: true,
                     sameSite: process.env.SERVER_DOMAIN ? "lax" : "strict",
-                    secure: process.env.NODE_ENV === 'development' ? false : isSecure, 
+                    secure: process.env.NODE_ENV === 'development' ? false : isSecure,
                     expires: response.data.refresh_token_end_dt ? new Date(response.data.refresh_token_end_dt) : new Date(new Date().getTime() + (60 * 60 * 24 * 30 * 1000))
                 });
             }
@@ -85,7 +90,12 @@ export async function GET(request: Request): Promise<Response> {
                 return new Response(JSON.stringify({ success: true, data: response.data.access_token }), { headers });
             }
         } catch (error: any) {
-            console.log(`-------------Refresh Error ${dayjs().format('YYYY-MM-DD HH:mm:ss')} --------------`)
+            if (error?.response) {
+                console.log('status:', error.response.status)
+                console.log('data:', error.response.data)
+            } else {
+                console.log(error?.message ?? error)
+            }
             return new Response(JSON.stringify({ success: false }), { headers });
         }
     } else { // RefreshToken 미존재시, 로그인 정보 없음.

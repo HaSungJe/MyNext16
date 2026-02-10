@@ -1,16 +1,19 @@
 'use client';
-import { AccessDataType, UserInfoType, UserProfileType } from "@/types/user";
+import { AccessTokenDataType } from "@/types/access";
+import { UserInfoType, UserProfileType } from "@/types/user";
 import { createContext } from "react";
 
 type ProviderProps = {
-    accessData: AccessDataType;
+    accessTokenData: AccessTokenDataType;
+    isLogin: boolean;
     userInfo: UserInfoType;
     userProfile: UserProfileType;
     children: React.ReactNode;
 }
 
 // Context
-export const LoginContext = createContext<{accessToken: string, accessTokenRefresh: Function} | null>(null); // AccessToken
+export const AccessTokenContext = createContext<AccessTokenDataType>(null); // AccessToken
+export const IsLogin = createContext<boolean>(false); // 로그인 여부
 export const UserContext = createContext<UserInfoType | null>(null); // 회원정보
 export const UserProfileContext = createContext<UserProfileType>(null); // 회원 프로필
 
@@ -20,14 +23,16 @@ export const UserProfileContext = createContext<UserProfileType>(null); // 회�
  * @param param0 
  * @returns 
  */
-export default function LayoutProvider({accessData, userInfo, userProfile, children}: ProviderProps) {
+export default function LayoutProvider({accessTokenData, isLogin, userInfo, userProfile, children}: ProviderProps) {
     return (
-        <LoginContext.Provider value={accessData}>
-            <UserContext.Provider value={userInfo}> {/* 회원정보 */}
-                <UserProfileContext.Provider value={userProfile}> {/* 회원 프로필 */}
-                    {children}
-                </UserProfileContext.Provider>
-            </UserContext.Provider>
-        </LoginContext.Provider>
+        <AccessTokenContext.Provider value={accessTokenData}>
+            <IsLogin.Provider value={isLogin}>
+                <UserContext.Provider value={userInfo}> {/* 회원정보 */}
+                    <UserProfileContext.Provider value={userProfile}> {/* 회원 프로필 */}
+                        {children}
+                    </UserProfileContext.Provider>
+                </UserContext.Provider>
+            </IsLogin.Provider>
+        </AccessTokenContext.Provider>
     )
 }

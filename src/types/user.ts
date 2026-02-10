@@ -1,9 +1,3 @@
-// 로그인 및 재발급 함수 정보
-export type AccessDataType = {
-    accessToken: string;
-    accessTokenRefresh: Function;
-}
-
 // AccessToken Decode Type
 export type accessTokenDecodeType = {
     type: string;
