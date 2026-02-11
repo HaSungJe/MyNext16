@@ -5,7 +5,7 @@ import axios from 'axios';
 type AccessType = {
     accessToken: string;
     setAccessToken: (accessToken: string) => void;
-    reload?: boolean;
+    reload?: number;
 }
 
 /**
@@ -16,16 +16,19 @@ type AccessType = {
  * @param headers
  */
 export async function axiosGet(access: AccessType, url: string, headers: object = {}) {
+    access.reload = access?.reload ?? 0;
+
     try {
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         return await axios.get(url, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            if (access?.reload === false) {
+            if (access.reload < 5) {
                 const accessToken = await getAccessToken();
                 if (accessToken) {
                     access.setAccessToken(accessToken);
-                    access.reload = true;
+                    access.accessToken = accessToken;
+                    access.reload += 1;
                     return await axiosGet(access, url, headers);
                 } else {
                     access.setAccessToken(null);
@@ -53,16 +56,19 @@ export async function axiosGet(access: AccessType, url: string, headers: object 
  * @returns 
  */
 export async function axiosPost(access: AccessType, url: string, body: any, headers: object = {}) {
+    access.reload = access?.reload ?? 0;
+    
     try {
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         return await axios.post(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            if (access?.reload === false) {
+            if (access.reload < 5) {
                 const accessToken = await getAccessToken();
                 if (accessToken) {
                     access.setAccessToken(accessToken);
-                    access.reload = true;
+                    access.accessToken = accessToken;
+                    access.reload += 1;
                     return await axiosPost(access, url, body, headers);
                 } else {
                     access.setAccessToken(null);
@@ -90,16 +96,19 @@ export async function axiosPost(access: AccessType, url: string, body: any, head
  * @returns 
  */
 export async function axiosPut(access: AccessType, url: string, body: any, headers: object = {}) {
+    access.reload = access?.reload ?? 0;
+
     try {
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         return await axios.put(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            if (access?.reload === false) {
+            if (access.reload < 5) {
                 const accessToken = await getAccessToken();
                 if (accessToken) {
                     access.setAccessToken(accessToken);
-                    access.reload = true;
+                    access.accessToken = accessToken;
+                    access.reload += 1;
                     return await axiosPut(access, url, body, headers);
                 } else {
                     access.setAccessToken(null);
@@ -127,16 +136,19 @@ export async function axiosPut(access: AccessType, url: string, body: any, heade
  * @returns 
  */
 export async function axiosPatch(access: AccessType, url: string, body: any, headers: object = {}) {
+    access.reload = access?.reload ?? 0;
+
     try {
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         return await axios.patch(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            if (access?.reload === false) {
+            if (access.reload < 5) {
                 const accessToken = await getAccessToken();
                 if (accessToken) {
                     access.setAccessToken(accessToken);
-                    access.reload = true;
+                    access.accessToken = accessToken;
+                    access.reload += 1;
                     return await axiosPatch(access, url, body, headers);
                 } else {
                     access.setAccessToken(null);
@@ -163,6 +175,8 @@ export async function axiosPatch(access: AccessType, url: string, body: any, hea
  * @param headers
  */
 export async function axiosDelete(access: AccessType, url: string, body: any, headers: object = {}) {
+    access.reload = access?.reload ?? 0;
+
     try {
         const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
         if (body && body !== null) {
@@ -172,11 +186,12 @@ export async function axiosDelete(access: AccessType, url: string, body: any, he
         }
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
-            if (access?.reload === false) {
+            if (access.reload < 5) {
                 const accessToken = await getAccessToken();
                 if (accessToken) {
                     access.setAccessToken(accessToken);
-                    access.reload = true;
+                    access.accessToken = accessToken;
+                    access.reload += 1;
                     return await axiosDelete(access, url, body, headers);
                 } else {
                     access.setAccessToken(null);

@@ -1,24 +1,27 @@
 'use client';
-
-import { AccessDataType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { LoginContext } from "../LayoutProvider";
+import { IsLogin, RootLayoutLoadingContext } from "../LayoutProvider";
 import Loading from "@/components/Loading";
 
 export default function LoginAfterLayout({children}: {children: React.ReactNode}) {
     const router = useRouter();
+    const rootLayoutLoadingContext: boolean = useContext(RootLayoutLoadingContext);
+    const isLogin: boolean = useContext(IsLogin);
     const [loading, setLoading] = useState<boolean>(true);
-    const loginData: AccessDataType = useContext(LoginContext);
     
     // 로그인이 되어있지 않은 경우, 로그인 페이지로 이동
     useEffect(() => {
-        if (loginData?.accessToken) {
-            setLoading(false);
+        if (rootLayoutLoadingContext) {
+            setLoading(true);
         } else {
-            router.push('/login');
+            if (isLogin) {
+                setLoading(false);
+            } else {
+                router.push('/login');
+            }
         }
-    }, []);
+    }, [rootLayoutLoadingContext, isLogin]);
 
     if (loading) {
         return (

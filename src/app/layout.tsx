@@ -16,6 +16,8 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
     const [userProfile, setUserProfile] = useState<UserProfileType | null>(null);
 
     useEffect(() => {
+        setLoading(true);
+
         // 이전페이지정보 저장.
         if (pathname.indexOf('/sign') === -1) {
             sessionStorage.setItem('referer', pathname);
@@ -25,8 +27,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
         getAccessToken().then(async (accessToken: string) => {
             if (accessToken) {
                 setAccessToken(accessToken);
-                setLoading(true);
-                
+  
                 try {
                     // 회원정보 입력
                     setUserInfo({
@@ -59,6 +60,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
         <html lang="ko">
             <body>
                 <LayoutProvider 
+                    loading={loading}
                     accessTokenData={{accessToken, setAccessToken}} 
                     isLogin={accessToken ? true : false}
                     userInfo={userInfo} 
