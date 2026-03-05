@@ -1,6 +1,6 @@
 'use client';
 import { useContext, useEffect } from "react";
-import { IsLogin } from "./LayoutProvider";
+import { IsLogin } from "./RootLayoutProvider";
 import { useRouter } from "next/navigation";
 
 export default function Page() {

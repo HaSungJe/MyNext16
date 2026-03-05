@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { IsLogin, RootLayoutLoadingContext } from "../LayoutProvider";
+import { IsLogin, RootLayoutLoadingContext } from "../RootLayoutProvider";
 import Loading from "@/components/Loading";
 
 export default function LoginAfterLayout({children}: {children: React.ReactNode}) {

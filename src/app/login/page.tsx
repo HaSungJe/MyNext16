@@ -7,7 +7,7 @@ import { setAccessToken, setRefreshToken } from "@/utils/cookie";
 import axios from "axios";
 import Loading from "@/components/Loading";
 import useInput, { UseInputType } from "@/hooks/useInput";
-import { IsLogin } from "../LayoutProvider";
+import { IsLogin } from "../RootLayoutProvider";
 
 const Login: React.FC<null> = memo(() => {
     const router = useRouter();
