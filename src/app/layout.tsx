@@ -1,9 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import '@style/css/import.css';
-import '@style/css/popup.css';
-import '@style/css/swiper/swiper.css';
-import '@style/css/swiper/swiper-bundle.css';
-import '@style/css/swiper-custom.css';
 import RootLayoutContent from './RootLayoutContent';
 
 export const viewport: Viewport = {

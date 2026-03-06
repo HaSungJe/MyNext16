@@ -38,7 +38,9 @@ export async function POST(request: Request): Promise<Response> {
         });
     
         return new Response(JSON.stringify({ success: true }), { headers });
-    } catch (error) {
+    } catch (error: any) {
+        console.log(`---------Refresh Error --------`)
+        console.log(error?.response?.data)
         return new Response(JSON.stringify({ success: false }), { headers });
     }
 }

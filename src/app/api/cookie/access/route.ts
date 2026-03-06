@@ -2,17 +2,12 @@
 import { accessTokenDecodeType } from "@/types/access";
 import { cookies, headers as nextHeaders } from "next/headers";
 import axios from "axios";
-import https from 'https';
 import dayjs from 'dayjs';
 import * as jwt from 'jsonwebtoken';
 
 const headers = {
     'Content-Type': 'application/json'
 }
-
-const httpsAgent = new https.Agent({
-    rejectUnauthorized: false,
-})
 
 /**
  * AccessToken 얻기
@@ -50,17 +45,8 @@ export async function GET(request: Request): Promise<Response> {
     if (refreshToken) {
         try {
             const refresh_token: string = refreshToken.value;            
-            const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/common/user/refresh`;
-            const body = {refresh_token};
-            const response = await axios.post(url, body, {
-                headers: {
-                    authorization,
-                    Authorization: authorization,
-                    'Content-Type': 'application/json'
-                }
-            });
-
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/refresh`;
+            const response = await axios.post(url, {refresh_token}, {});
             if (response.data.refresh_token) {
                 cookieStore.set('refreshToken', response.data.refresh_token, {
                     path: "/",
@@ -73,7 +59,7 @@ export async function GET(request: Request): Promise<Response> {
             }
 
             // 유지시간보다 1분 빨리 끝나도록해서 가능한 재발급받도록
-            const setTime = new Date(new Date(response.data.access_token_end_dt).getTime() - (60 * 1000)); 
+            const setTime = new Date(new Date(response.data.access_token_end_dt).getTime() - (5 * 1000)); 
             cookieStore.set('accessToken', response.data.access_token, {
                 path: "/",
                 domain: process.env.SERVER_DOMAIN ?? undefined,
@@ -90,6 +76,7 @@ export async function GET(request: Request): Promise<Response> {
                 return new Response(JSON.stringify({ success: true, data: response.data.access_token }), { headers });
             }
         } catch (error: any) {
+            console.log(`-------------Refresh Error --- ${dayjs().format('YYYY-MM-DD HH:mm:ss')} --------------`)
             if (error?.response) {
                 console.log('status:', error.response.status)
                 console.log('data:', error.response.data)

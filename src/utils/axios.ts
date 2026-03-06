@@ -19,8 +19,7 @@ export async function axiosGet(access: AccessType, url: string, headers: object 
     access.reload = access?.reload ?? 0;
 
     try {
-        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.get(url, {headers: {...headers, authorization, accessToken: access.accessToken}});
+        return await axios.get(url, {headers: {...headers, authorization: `Bearer ${access.accessToken}`}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
             if (access.reload < 5) {
@@ -59,8 +58,7 @@ export async function axiosPost(access: AccessType, url: string, body: any, head
     access.reload = access?.reload ?? 0;
     
     try {
-        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.post(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
+        return await axios.post(url, body, {headers: {...headers, authorization: `Bearer ${access.accessToken}`}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
             if (access.reload < 5) {
@@ -99,8 +97,7 @@ export async function axiosPut(access: AccessType, url: string, body: any, heade
     access.reload = access?.reload ?? 0;
 
     try {
-        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.put(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
+        return await axios.put(url, body, {headers: {...headers, authorization: `Bearer ${access.accessToken}`}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
             if (access.reload < 5) {
@@ -139,8 +136,7 @@ export async function axiosPatch(access: AccessType, url: string, body: any, hea
     access.reload = access?.reload ?? 0;
 
     try {
-        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        return await axios.patch(url, body, {headers: {...headers, authorization, accessToken: access.accessToken}});
+        return await axios.patch(url, body, {headers: {...headers, authorization: `Bearer ${access.accessToken}`}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
             if (access.reload < 5) {
@@ -168,22 +164,17 @@ export async function axiosPatch(access: AccessType, url: string, body: any, hea
 
 /**
  * Delete
+ * - body가 필요한 경우, headers 안에 data: body 선언
  * 
  * @param access
  * @param url 
- * @param body 
  * @param headers
  */
-export async function axiosDelete(access: AccessType, url: string, body: any, headers: object = {}) {
+export async function axiosDelete(access: AccessType, url: string, headers: object = {}) {
     access.reload = access?.reload ?? 0;
 
     try {
-        const authorization = process.env.NEXT_PUBLIC_AUTHORIZATION;
-        if (body && body !== null) {
-            return await axios.delete(url, { data: body, headers: {...headers, authorization, accessToken: access.accessToken}});
-        } else {
-            return await axios.delete(url, { headers: {...headers, authorization, accessToken: access.accessToken}});
-        }
+        return await axios.delete(url, {headers: {...headers, authorization: `Bearer ${access.accessToken}`}});
     } catch (error: any) {
         if (error.response.data.statusCode === 401) {
             if (access.reload < 5) {
@@ -192,7 +183,7 @@ export async function axiosDelete(access: AccessType, url: string, body: any, he
                     access.setAccessToken(accessToken);
                     access.accessToken = accessToken;
                     access.reload += 1;
-                    return await axiosDelete(access, url, body, headers);
+                    return await axiosDelete(access, url, headers);
                 } else {
                     access.setAccessToken(null);
                     await deleteToken();

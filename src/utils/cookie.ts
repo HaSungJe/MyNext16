@@ -8,7 +8,7 @@ import axios from 'axios';
  */
 export async function getSNSAccessToken(): Promise<any> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/sns`);
+        const response = await axios.get(`/api/cookie/sns`);
         if (response.data.success) {
             return response.data.data;
         } else {
@@ -26,7 +26,7 @@ export async function getSNSAccessToken(): Promise<any> {
  */
 export async function deleteSNSAccessToken(): Promise<boolean> {
     try {
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/sns`);
+        const response = await axios.delete(`/api/cookie/sns`);
         if (response.data.success) {
             return true;
         } else {
@@ -44,7 +44,7 @@ export async function deleteSNSAccessToken(): Promise<boolean> {
  */
 export async function getAccessToken(): Promise<string | null> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/access`);
+        const response = await axios.get(`/api/cookie/access`);
         if (response.data.success) {
             return response.data.data;
         } else {
@@ -62,7 +62,7 @@ export async function getAccessToken(): Promise<string | null> {
  */
 export async function getAccessTokenData(): Promise<any> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/access?option=1`);
+        const response = await axios.get(`/api/cookie/access?option=1`);
         if (response.data.success) {
             return response.data.data;
         } else {
@@ -80,7 +80,7 @@ export async function getAccessTokenData(): Promise<any> {
  */
 export async function checkAuth(): Promise<boolean> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/access`);
+        const response = await axios.get(`/api/cookie/access`);
         if (response.data.success) {
             return true;
         } else {
@@ -95,11 +95,12 @@ export async function checkAuth(): Promise<boolean> {
  * RefreshToken 저장
  * 
  * @param refreshToken 
+ * @param setTime 
  * @return
  */
-export async function setRefreshToken(refreshToken: string): Promise<boolean> {
+export async function setRefreshToken(refreshToken: string, setTime: string): Promise<boolean> {
     try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/refresh`, {data: refreshToken});
+        const response = await axios.post(`/api/cookie/refresh`, {setTime, data: refreshToken});
         if (response.data.success) {
             return true;
         } else {
@@ -119,7 +120,7 @@ export async function setRefreshToken(refreshToken: string): Promise<boolean> {
  */
 export async function setAccessToken(accessToken: string, setTime: string): Promise<boolean> {
     try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/access`, {setTime, data: accessToken});
+        const response = await axios.post(`/api/cookie/access`, {setTime, data: accessToken});
         if (response.data.success) {
             return true;
         } else {
@@ -137,7 +138,7 @@ export async function setAccessToken(accessToken: string, setTime: string): Prom
  */
 export async function deleteToken(): Promise<boolean> {
     try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/cookie/logout`, {});
+        const response = await axios.post(`/api/cookie/logout`, {});
         if (response.data.success) {
             return true;
         } else {

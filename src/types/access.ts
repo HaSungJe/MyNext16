@@ -12,8 +12,8 @@ export type accessTokenDecodeType = {
     exp: number;
 }
 
-// AccessToken
-export type AccessTokenDataType = {
+// AccessToken Context
+export type AccessTokenContextType = {
     accessToken: string;
     setAccessToken: (accessToken: string) => void;
 }

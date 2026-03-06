@@ -1,9 +1,8 @@
 'use client';
+import DashboardContent from "@/features/dashboard/Dashboard";
 
-export default function Home() {    
+export default function Dashboard() {    
     return (
-        <div>
-            대시보드
-        </div>
+        <DashboardContent />
     );
 }

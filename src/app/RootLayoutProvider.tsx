@@ -1,17 +1,17 @@
 'use client';
-import { AccessTokenDataType } from "@/types/access";
+import { AccessTokenContextType } from "@/types/access";
 import { createContext } from "react";
 
 type ProviderProps = {
     rootLayoutLoading: boolean;
-    accessTokenData: AccessTokenDataType;
+    accessTokenData: AccessTokenContextType;
     isLogin: boolean;
     children: React.ReactNode;
 }
 
 // Context
 export const RootLayoutLoadingContext = createContext<boolean>(false); // 로딩여부
-export const AccessTokenContext = createContext<AccessTokenDataType>(null); // AccessToken
+export const AccessTokenContext = createContext<AccessTokenContextType>(null); // AccessToken
 export const IsLogin = createContext<boolean>(false); // 로그인 여부
 
 /**

@@ -2,7 +2,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { deleteToken, getAccessToken } from '@/utils/cookie';
-import { axiosErrorHandle } from '@/utils/util';
+import { axiosErrorHandle } from '@/utils/axios-error';
 import NextTopLoader from 'nextjs-toploader';
 import Scripts from '@/components/Scripts';
 import RootLayoutProvider from './RootLayoutProvider';
@@ -49,8 +49,8 @@ export default function RootLayoutContent({ children }: { children: React.ReactN
                 <Scripts />
                 <RootLayoutProvider
                     rootLayoutLoading={rootLayoutLoading}
-                    isLogin={accessToken ? true : false}
                     accessTokenData={{accessToken, setAccessToken}}
+                    isLogin={accessToken ? true : false}
                 >
                     {children}
                 </RootLayoutProvider>
