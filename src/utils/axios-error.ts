@@ -9,18 +9,20 @@ import { resetValidationError } from "./validation";
  */
 export async function axiosErrorHandle(error: any, isReset: boolean = true): Promise<void> {
     if (error?.status) {
-        const validationErrors: Array<{type: string, property: string, message: string}> = error?.response?.data?.validationError ?? [];
+        const validationErrors: Array<{type: string, property: string, message: string}> = error?.response?.data?.validationErrors ?? [];
         if (validationErrors && validationErrors.length > 0) {
             if (isReset) {
                 resetValidationError();
             }
     
             let count = 0;
-            for (let i=0; i<error.response.data.validationError.length; i++) {
-                const doc: any = document.querySelector(`span[data-type=validation-alert][data-id=${error.response.data.validationError[i].property}]`);
+            for (let i=0; i<error.response.data.validationErrors.length; i++) {
+                const doc: any = document.querySelector(`span[data-type=validation-alert][data-id=${error.response.data.validationErrors[i].property}]`);
+                console.log(doc)
+                
                 if (doc) {
                     count++;
-                    doc.innerText = error.response.data.validationError[i].message;
+                    doc.innerText = error.response.data.validationErrors[i].message;
                     doc.style.color = 'red';
                     doc.style.display = 'block';
                 }
