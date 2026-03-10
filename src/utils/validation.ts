@@ -1,5 +1,11 @@
 import { validateOrReject } from "class-validator";
 
+export type ValidationErrorType = {
+    type: string;
+    property: string;
+    message: string;
+}
+
 /**
  * Validation Error 초기화
  */
@@ -27,27 +33,20 @@ export async function validateAction(dto: any, reset: boolean = true): Promise<b
         await validateOrReject(dto);
         return true;
     } catch (err: any) {
-        const errors = [];
-
+        const validationErrors: ValidationErrorType[] = [];
         for (let i=0; i<err.length; i++) {
             const error = err[i];
             const key = (Object.keys(err[i]['constraints']))[0];
             if (key === 'isBoolean') {
                 if (error['contexts']) {
-                    errors.push({
+                    validationErrors.push({
                         type: key,
                         property: error['contexts'][key]['target'],
                         message: error['constraints'][key]
                     });
-    
-                } else {
-                    errors.push({
-                        type: key,
-                        message: error['constraints'][key]
-                    });
                 }
             } else {
-                errors.push({
+                validationErrors.push({
                     type: key,
                     property: error['property'],
                     message: error['constraints'][key]
@@ -55,21 +54,22 @@ export async function validateAction(dto: any, reset: boolean = true): Promise<b
             }
         }
 
-        let span_alert_count = 0;
-        for (let i=0; i<errors.length; i++) {
-            const doc: any = document.querySelector(`span[data-type=validation-alert][data-id=${errors[i].property}]`);
-            if (doc) {
-                doc.innerText = errors[i].message;
-                doc.style.color = 'red';
-                doc.style.display = 'block';
-                span_alert_count++;
+        // Document 개수
+        let setDocumentTextCount: number = 0;
+        for (let i=0; i<validationErrors.length; i++) {
+            const findDocument: any = document.querySelector(`span[data-type=validation-alert][data-id=${validationErrors[i].property}]`);
+            if (findDocument) {
+                setDocumentTextCount++;
+                findDocument.innerText = validationErrors[i].message;
+                findDocument.style.color = 'red';
+                findDocument.style.display = 'block';
             }
         }
-
-        if (errors && errors.length > 0 && span_alert_count === 0) {
-            alert(errors[0].message);
+        
+        if (validationErrors && validationErrors.length > 0 && setDocumentTextCount === 0) {
+            alert(validationErrors[0].message);
         }
-
+            
         return false;
     }
 }
