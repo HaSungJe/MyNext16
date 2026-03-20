@@ -19,6 +19,7 @@ export default function LoginContent(): React.ReactNode {
     // 커스텀 훅 사용
     const loginId: UseInputType = useInput('');
     const loginPw: UseInputType = useInput('');
+    const [isSaveId, setIsSaveId] = useState<boolean>(false);
 
     // 이미 로그인된 경우 대시보드로 이동
     useEffect(() => {
@@ -28,6 +29,11 @@ export default function LoginContent(): React.ReactNode {
             if (isLogin) {
                 router.push('/dashboard');
             } else {
+                const saveId: string = localStorage.getItem('saveId');
+                if (saveId) {
+                    setIsSaveId(true);
+                    loginId.setValue(saveId)
+                }
                 setLoading(false);
             }
         }
@@ -40,6 +46,15 @@ export default function LoginContent(): React.ReactNode {
         if (vCheck) {
             try {
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/login`, dto);
+
+                // 아이디 저장하기 선택상태일 경우, 아이디 저장
+                if (isSaveId) {
+                    localStorage.setItem('saveId', loginId.value);
+                } else {
+                    localStorage.removeItem('saveId');
+                } 
+
+                // 로그인 정보 저장
                 await setRefreshToken(response.data.refresh_token, response.data.refresh_token_end_dt);
                 await setAccessToken(response.data.access_token, response.data.access_token_end_dt);
                 router.push('/dashboard');
@@ -91,6 +106,19 @@ export default function LoginContent(): React.ReactNode {
                                     onKeyDown={enterScope}
                                 />
                                 <span data-type="validation-alert" data-id="login_pw" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>아이디 저장</th>
+                            <td>
+                                <input 
+                                    type="checkbox" 
+                                    className="checkbox"
+                                    id={'save-id-checkbox'}
+                                    checked={isSaveId}
+                                    onChange={() => setIsSaveId(!isSaveId)}
+                                />
+                                <label htmlFor={'save-id-checkbox'}>아이디 저장하기</label>
                             </td>
                         </tr>
                     </tbody>

@@ -1,6 +1,7 @@
 'use server';
 import { accessTokenDecodeType } from "@/types/access";
 import { cookies, headers as nextHeaders } from "next/headers";
+import https from 'https';
 import axios from "axios";
 import dayjs from 'dayjs';
 import * as jwt from 'jsonwebtoken';
@@ -45,8 +46,9 @@ export async function GET(request: Request): Promise<Response> {
     if (refreshToken) {
         try {
             const refresh_token: string = refreshToken.value;            
-            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/refresh`;
-            const response = await axios.post(url, {refresh_token}, {});
+            const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/refresh`;
+            const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+            const response = await axios.post(apiUrl, {refresh_token}, { httpsAgent });
             if (response.data.refresh_token) {
                 cookieStore.set('refreshToken', response.data.refresh_token, {
                     path: "/",
