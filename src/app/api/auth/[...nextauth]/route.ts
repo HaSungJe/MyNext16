@@ -8,6 +8,9 @@ import NextAuth from "next-auth";
 import * as jwt from 'jsonwebtoken';
 
 const handler = NextAuth({
+    pages: {
+        error: '/sign/in',
+    },
     useSecureCookies: process.env.NODE_ENV === 'production',
     cookies: {
         pkceCodeVerifier: {
