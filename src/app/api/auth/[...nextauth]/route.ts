@@ -12,6 +12,12 @@ const handler = NextAuth({
         signIn: '/sign/in',
         error: '/sign/in',
     },
+    logger: {
+        error(code, ...message) {
+            if (code === 'OAUTH_CALLBACK_HANDLER_ERROR' || code === 'OAUTH_CALLBACK_ERROR') return;
+            console.error(code, ...message);
+        },
+    },
     useSecureCookies: process.env.NODE_ENV === 'production',
     cookies: {
         pkceCodeVerifier: {
