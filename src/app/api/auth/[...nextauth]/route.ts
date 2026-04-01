@@ -9,6 +9,7 @@ import * as jwt from 'jsonwebtoken';
 
 const handler = NextAuth({
     pages: {
+        signIn: '/sign/in',
         error: '/sign/in',
     },
     useSecureCookies: process.env.NODE_ENV === 'production',
