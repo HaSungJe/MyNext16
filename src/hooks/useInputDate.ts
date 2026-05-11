@@ -2,13 +2,14 @@ import { ChangeEvent, ChangeEventHandler, useCallback, useState } from "react";
 
 export type UseInputDateType = {
     value: string;
+    filter: ('Y' | 'M' | 'D')[];
     onChange: ChangeEventHandler<HTMLInputElement>;
     setValue: Function;
     resetValue: Function;
 }
 
 // 검색정보 변경
-export default function useInputDate(dot: string, initValue: string = ""): UseInputDateType {
+export default function useInputDate(dot: string, filter: ('Y' | 'M' | 'D')[], initValue: string = ""): UseInputDateType {
     const [value, setValue] = useState<string>(initValue);
 
     // 값 생성
@@ -20,13 +21,13 @@ export default function useInputDate(dot: string, initValue: string = ""): UseIn
         const day = changeValue.substring(6, 8);
 
         const result: Array<string> = [];
-        if (year) {
+        if (year && filter.includes('Y')) {
             result.push(year);
         }
-        if (month) {
+        if (month && filter.includes('M')) {
             result.push(month);
         }
-        if (day) {
+        if (day && filter.includes('D')) {
             result.push(day);
         }
 
